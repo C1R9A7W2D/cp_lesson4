@@ -4,18 +4,28 @@
     <title>Lesson 4</title>
     <meta charset="UTF-8"/>
 
+    <script src="src/miniMaple.js" type="module"></script>
     <script src="src/index.js" type="module"></script>
 </head>
 
 <body>
-<h1>Implement the symbolic diff here</h1>
-<div id="container">
+<h1>Вычисление производной</h1>
 
-</div>
 <div>
-    <button id="demoButton">
-        Add something
-    </button>
+    <label for="inputExpression">Введите выражение и переменную (через запятую):</label>
+    <input
+            type="text"
+            id="inputExpression"
+            placeholder="Например: x^2 + 3*x + 5, x"
+    />
 </div>
+
+<div>
+    <button id="demoButton">Вычислить производную</button>
+</div>
+
+<div id="container">
+</div>
+
 </body>
 </html>
