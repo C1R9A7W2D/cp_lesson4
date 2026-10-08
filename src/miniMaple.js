@@ -1,7 +1,7 @@
 class MiniMaple {
-    s;
-    x;
-    xInd;
+    s
+    x
+    xInd
 
     constructor(s, x) {
         this.s = s
@@ -20,28 +20,10 @@ class MiniMaple {
             return ''
 
         let sepSignInd = this.getSeparatingSignIndex();
-        if (sepSignInd != 0)
+        if (sepSignInd != -1)
             return this.breakPolynomial(sepSignInd)
-
-        if (this.xInd != -1) {
-            let coef = this.getCoef();
-            let power = this.getPower();
-
-            coef *= power
-
-            let newCoefString = this.newCoefString(coef)
-            let newPowerString = this.newPowerString(power)
-
-            if (power == 1)
-                if (coef == 1)
-                    return "1"
-                else
-                    return newCoefString
-            else
-                return newCoefString + `*${this.x}` + newPowerString
-        }
-
-        return "0";
+        else
+            return this.getDiffOfSingle()
     }
 
     throwErrorIfWrongOperation() {
@@ -54,18 +36,20 @@ class MiniMaple {
                 break;
             }
         }
+
         if (foundChar != '')
             throw new Error(`Использована неподходящая операция: ${foundChar}`)
     }
 
     getSeparatingSignIndex() {
-        let sepSignInd = 0
+        let sepSignInd = -1
 
         for (let i = 0; i < this.s.length; i++) {
-            if (this.s[i] === '+' || this.s[i] === '-') {
+            if (this.s[i] == '+' || this.s[i] == '-') {
                 sepSignInd = i
             }
         }
+        
         return sepSignInd;
     }
 
@@ -74,6 +58,31 @@ class MiniMaple {
         let sign = this.s.charAt(sepSignInd);
         let right = MiniMaple.diff(this.s.substring(sepSignInd + 1), this.x);
         return `${left}${sign}${right}`;
+    }
+
+    getDiffOfSingle() {
+        let res = "0"
+
+        if (this.xInd != -1) {
+            let coef = this.getCoef()
+            let power = this.getPower()
+
+            coef *= power
+
+            let newCoefString = this.newCoefString(coef)
+            let newPowerString = this.newPowerString(power)
+
+            if (power == 1)
+                if (coef == 1)
+                    res = "1"
+
+                else
+                    res = newCoefString
+
+            else
+                res = newCoefString + `*${this.x}` + newPowerString
+        }
+        return res
     }
 
     getCoef() {
