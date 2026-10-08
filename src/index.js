@@ -29,14 +29,15 @@ function addSomething() {
     const expression = parts[0].trim();
     const variable = parts[1].trim();
 
+    console.log(expression);
+
     if (!expression || !variable) {
         showError('Выражение и переменная не должны быть пусты');
         return;
     }
 
     try {
-        const maple = new MiniMaple();
-        const result = maple.diff(expression, variable);
+        const result = MiniMaple.diff(expression, variable);
 
         const someDummyDiv = document.createElement('div');
         someDummyDiv.classList.add('generated');
