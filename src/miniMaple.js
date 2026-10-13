@@ -1,12 +1,17 @@
+import {TermFactory} from "./termFactory";
+
 class MiniMaple {
-    s
+    str
     x
-    xInd
+
+    sepSignIndices;
+
+    terms = []
+    signs = []
 
     constructor(s, x) {
-        this.s = s
+        this.str = s
         this.x = x
-        this.xInd = s.lastIndexOf(x)
     }
 
     static diff(s, x) {
@@ -15,13 +20,10 @@ class MiniMaple {
 
     diff() {
         this.throwErrorIfWrongOperation();
+        this.getSeparatingSignIndices();
 
-        if (this.s == '' || this.x == '')
-            return ''
-
-        let sepSignInd = this.getSeparatingSignIndex();
-        if (sepSignInd != -1)
-            return this.breakPolynomial(sepSignInd)
+        if (this.sepSignIndices.length > 0)
+            return this.getDiffOfPolynomial()
         else
             return this.getDiffOfSingle()
     }
@@ -30,89 +32,83 @@ class MiniMaple {
         const symbols = "/!%&()";
         let foundChar = ''
 
-        for (let char of symbols) {
-            if (this.s.includes(char)) {
-                foundChar = char
+        for (let symbol of symbols)
+            if (this.str.includes(symbol)) {
+                foundChar = symbol
                 break;
             }
-        }
 
         if (foundChar != '')
             throw new Error(`Использована неподходящая операция: ${foundChar}`)
     }
 
-    getSeparatingSignIndex() {
-        let sepSignInd = -1
+    getSeparatingSignIndices() {
+        this.sepSignIndices = []
 
-        for (let i = 0; i < this.s.length; i++) {
-            if (this.s[i] == '+' || this.s[i] == '-') {
-                sepSignInd = i
-            }
-        }
-        
-        return sepSignInd;
+        for (let i = 0; i < this.str.length; i++)
+            this.pushIfSeparatingSign(i)
     }
 
-    breakPolynomial(sepSignInd) {
-        let left = MiniMaple.diff(this.s.substring(0, sepSignInd), this.x);
-        let sign = this.s.charAt(sepSignInd);
-        let right = MiniMaple.diff(this.s.substring(sepSignInd + 1), this.x);
-        return `${left}${sign}${right}`;
+    pushIfSeparatingSign(i) {
+        if (this.str[i] == '+' || this.str[i] == '-')
+            this.sepSignIndices.push(i)
+        return this.sepSignIndices;
+    }
+
+    getDiffOfPolynomial() {
+        this.getTermsAndSigns();
+        const diffsWithSigns = this.getDiffsWithSigns();
+        return diffsWithSigns.join("");
+    }
+
+    getTermsAndSigns() {
+        let prevInd = 0;
+        for (let i = 0; i < this.sepSignIndices.length; i++) {
+            prevInd = this.pushTermAndNextSign(prevInd, i);
+        }
+
+        this.pushLastTerm(prevInd);
+    }
+
+    pushTermAndNextSign(prevInd, i) {
+        const ind = this.sepSignIndices[i];
+        const subString = this.str.substring(prevInd, ind)
+
+        this.makeNewTermsElement(subString)
+        this.signs.push(this.str.charAt(ind))
+
+        return ind;
+    }
+
+    pushLastTerm(prevInd) {
+        const lastSubString = this.str.substring(prevInd + 1)
+        this.makeNewTermsElement(lastSubString)
+    }
+
+    makeNewTermsElement(subString) {
+        let term = TermFactory.makeTerm(subString, this.x)
+        this.terms.push(term)
+    }
+
+    getDiffsWithSigns() {
+        console.debug(this.terms)
+        console.debug(this.signs)
+
+        let diffsAndSigns = []
+        for (let i = 0; i < this.terms.length - 1; i++) {
+            diffsAndSigns.push(this.terms[i].diff())
+            diffsAndSigns.push(this.signs[i])
+        }
+
+        diffsAndSigns.push(this.terms[this.terms.length - 1].diff())
+
+        return diffsAndSigns
     }
 
     getDiffOfSingle() {
-        let res = "0"
-
-        if (this.xInd != -1) {
-            let coef = this.getCoef()
-            let power = this.getPower()
-
-            coef *= power
-
-            let newCoefString = this.newCoefString(coef)
-            let newPowerString = this.newPowerString(power)
-
-            if (power == 1)
-                if (coef == 1)
-                    res = "1"
-
-                else
-                    res = newCoefString
-
-            else
-                res = newCoefString + `*${this.x}` + newPowerString
-        }
-        return res
-    }
-
-    getCoef() {
-        let coef = 1;
-        if (this.hasCoefficient())
-            coef = parseInt(this.s.substring(0, this.xInd - 1));
-        return coef;
-    }
-
-    hasCoefficient() {
-        return this.xInd != 0 && this.s.charAt(this.xInd - 1) == '*';
-    }
-
-    getPower() {
-        let power = 1
-        if (this.hasPower())
-            power = parseInt(this.s.substring(this.xInd + this.x.length + 1))
-        return power;
-    }
-
-    hasPower() {
-        return this.s.charAt(this.xInd + this.x.length) == '^';
-    }
-
-    newCoefString(coef) {
-        return coef == 1 ? "" : coef.toString();
-    }
-
-    newPowerString(power) {
-        return power == 2 ? "" : `^${power - 1}`;
+        const termFactory = new TermFactory(this.str, this.x);
+        const term = termFactory.makeTerm();
+        return term.diff()
     }
 }
 

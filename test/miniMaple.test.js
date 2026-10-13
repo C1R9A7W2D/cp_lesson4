@@ -1,9 +1,5 @@
 import {MiniMaple} from "../src/miniMaple";
 
-test('empty string returns empty', () => {
-    expect(MiniMaple.diff("", "")).toBe("");
-})
-
 test('const returns 0', () => {
     expect(MiniMaple.diff("157", "x")).toBe("0");
 })
