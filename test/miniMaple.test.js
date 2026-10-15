@@ -43,3 +43,11 @@ test('parts of a polynomial work separately', () => {
 test('wrong operation throws error', () => {
     expect(() => MiniMaple.diff('x^7 / 16', 'x')).toThrow("Использована неподходящая операция: /")
 })
+
+test('delete zero from polynomial', () => {
+    expect(MiniMaple.diff('x^2 - 5', 'x')).toBe("2*x")
+    expect(MiniMaple.diff('5 + x^3', 'x')).toBe("3*x^2")
+    expect(MiniMaple.diff('x^2 - 2 + 3*x', 'x')).toBe("2*x+3")
+    expect(MiniMaple.diff('2-2*x^2+3*x', 'x')).toBe("-4*x+3")
+    expect(MiniMaple.diff('112', 'x')).toBe("0")
+})
