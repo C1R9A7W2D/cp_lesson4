@@ -91,18 +91,45 @@ class MiniMaple {
     }
 
     getDiffsWithSigns() {
-        console.debug(this.terms)
-        console.debug(this.signs)
+        // console.debug(this.terms)
+        // console.debug(this.signs)
 
         let diffsAndSigns = []
         for (let i = 0; i < this.terms.length - 1; i++) {
-            diffsAndSigns.push(this.terms[i].diff())
-            diffsAndSigns.push(this.signs[i])
+            this.PushTermAndSignOrRemoveZeroTerm(i, diffsAndSigns);
         }
 
-        diffsAndSigns.push(this.terms[this.terms.length - 1].diff())
+        const lastDiff = this.terms[this.terms.length - 1].diff();
+        if (lastDiff == "0")
+            diffsAndSigns.pop()
+        else
+            diffsAndSigns.push(lastDiff)
 
         return diffsAndSigns
+    }
+
+    PushTermAndSignOrRemoveZeroTerm(i, diffsAndSigns) {
+        const diff = this.terms[i].diff();
+        if (diff == "0") {
+            this.removeZeroTerm(diffsAndSigns, i);
+        }
+        else {
+            this.pushDiffAndNextSign(diffsAndSigns, diff, i);
+        }
+    }
+
+    removeZeroTerm(diffsAndSigns, i) {
+        if (i != 0) {
+            diffsAndSigns.pop();
+            diffsAndSigns.push(this.signs[i]);
+        }
+        else
+            ;   // Пропустить терм и знак
+    }
+
+    pushDiffAndNextSign(diffsAndSigns, diff, i) {
+        diffsAndSigns.push(diff);
+        diffsAndSigns.push(this.signs[i]);
     }
 
     getDiffOfSingle() {
